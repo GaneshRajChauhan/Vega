@@ -8,7 +8,7 @@ namespace vega.Mapping
 {
     public class MappingProfile:Profile
     {
-        public MappingProfile()
+              public MappingProfile()
         {
 
             //Domain to Api Resource
@@ -68,6 +68,6 @@ namespace vega.Mapping
              }
             });
             
-        }
+}
     }
 }

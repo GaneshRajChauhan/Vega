@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ namespace vega.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateVehicle([FromBody]SaveVehicleResource vehicleResource)
         {
-            throw new Exception();
+            // throw new Exception();
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             var vehicle = mapper.Map<SaveVehicleResource, Vehicle>(vehicleResource);
@@ -44,18 +45,22 @@ namespace vega.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
             var vehicle = await repository.GetVehicle(id);
+
             if (vehicle == null)
-            {
                 return NotFound();
-            }
+
             mapper.Map<SaveVehicleResource, Vehicle>(vehicleResource, vehicle);
             vehicle.LastUpdate = DateTime.Now;
+
             await unitOfWork.CompleteAsync();
+
             vehicle = await repository.GetVehicle(vehicle.Id);
             var result = mapper.Map<Vehicle, VehicleResource>(vehicle);
 
             return Ok(result);
+
 
         }
         [HttpGet("{id}")]
@@ -75,14 +80,21 @@ namespace vega.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicle(int id)
         {
-            var vehicle = await context.Vehicles.Include(v => v.features).SingleOrDefaultAsync(v => v.Id == id);
+            var vehicle = await repository.GetVehicle(id, includeRelated: false);
+
             if (vehicle == null)
-            {
                 return NotFound();
-            }
+
             repository.Remove(vehicle);
             await unitOfWork.CompleteAsync();
+
             return Ok(id);
         }
+          [HttpGet]
+    public async Task<IEnumerable<VehicleResource>> GetVehicles()
+    {
+     var vehicles= await repository.GetVehicles();
+     return mapper.Map<IEnumerable<Vehicle>, IEnumerable<VehicleResource>>(vehicles);
+    }
     }
 }

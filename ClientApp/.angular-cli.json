@@ -24,6 +24,7 @@
       ],
       "scripts": [
              "../node_modules/ng2-toasty/index.js"
+             
 
       ],
       "environmentSource": "environments/environment.ts",

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Vega.persistance;
+using Swashbuckle.AspNetCore.Swagger;
 using AutoMapper;
 using Vega.Core;
 
@@ -17,7 +18,7 @@ namespace Vega
     public class Startup
     {
         public Startup(IConfiguration configuration)
-        { 
+        {
             Configuration = configuration;
         }
 
@@ -26,19 +27,31 @@ namespace Vega
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-              services.AddMvc();
+            services.AddMvc();
 
-             services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
-            services.AddScoped<IVehicleRepository,VehicleRepository>();
-            services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddSpaStaticFiles(configuration =>
+           {
+               configuration.RootPath = "ClientApp/dist";
+           });
+            services.AddScoped<IVehicleRepository, VehicleRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAutoMapper();
+            services.AddSwaggerGen(c =>
+          {
+              c.SwaggerDoc("v1", new Info { Title = "QuickApp API", Version = "v1" });
+
+              c.AddSecurityDefinition("OpenID Connect", new OAuth2Scheme
+              {
+                  Type = "oauth2",
+                  Flow = "password",
+                  TokenUrl = "/connect/token"
+              });
+          });
 
             // services.AddMvc();
-            services.AddDbContext<VegaDbContext>(options=>options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            services.AddDbContext<VegaDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -54,6 +67,11 @@ namespace Vega
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "QuickApp API V1");
+            });
 
             app.UseMvc(routes =>
             {

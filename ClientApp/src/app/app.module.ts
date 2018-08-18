@@ -14,6 +14,7 @@ import { CounterComponent } from './counter/counter.component';
 import { VehicleFormComponent } from './vehicle-form/vehicle-form.component';
 import { VehicleService } from './services/vehicle.service';
 import { AppErrorHandler } from './app.error-handler';
+import { VehicleListComponent } from './components/vehicle-list/vehicle-list';
 
 @NgModule({
     declarations: [
@@ -22,7 +23,8 @@ import { AppErrorHandler } from './app.error-handler';
         CounterComponent,
         FetchDataComponent,
         HomeComponent,
-        VehicleFormComponent
+        VehicleFormComponent,
+        VehicleListComponent
     ],
     imports: [
         CommonModule,
@@ -32,8 +34,10 @@ import { AppErrorHandler } from './app.error-handler';
         HttpClientModule,
         BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
         RouterModule.forRoot([
-            { path: '', redirectTo: 'home', pathMatch: 'full' },
-            {path:'vehicle/new',component:VehicleFormComponent},
+          { path: '', redirectTo: 'vehicles', pathMatch: 'full' },
+            {path:'vehicles/new',component:VehicleFormComponent},
+            {path:'vehicles/:id',component:VehicleFormComponent},
+            { path: 'vehicles', component: VehicleListComponent },
             { path: 'home', component: HomeComponent },
             { path: 'counter', component: CounterComponent },
             { path: 'fetch-data', component: FetchDataComponent },
